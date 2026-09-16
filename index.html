@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beatblock Palette Converter</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="container">
+      <h1>Beatblock Palette</h1>
+      <p class="subtitle">Turn any image into a 5-color Beatblock-style palette.</p>
+
+      <label class="upload-box" for="imageInput">
+        <span class="upload-icon">+</span>
+        <span>Choose an image</span>
+        <small>PNG, JPG, WEBP, etc.</small>
+      </label>
+      <input type="file" id="imageInput" accept="image/*" hidden>
+
+      <div id="status"></div>
+
+      <section id="previewSection" class="preview-section">
+        <div class="image-container">
+          <h2>Original</h2>
+          <canvas id="originalCanvas"></canvas>
+        </div>
+        <div class="image-container">
+          <h2>Beatblock Palette</h2>
+          <canvas id="resultCanvas"></canvas>
+        </div>
+      </section>
+
+      <button id="downloadButton" disabled>Download PNG</button>
+
+      <div class="palette">
+        <h2>Palette</h2>
+        <div class="palette-colors">
+          <div class="color">
+            <div class="swatch red"></div>
+            <span>255, 0, 0</span>
+          </div>
+          <div class="color">
+            <div class="swatch green"></div>
+            <span>0, 255, 0</span>
+          </div>
+          <div class="color">
+            <div class="swatch blue"></div>
+            <span>0, 0, 255</span>
+          </div>
+          <div class="color">
+            <div class="swatch magenta"></div>
+            <span>255, 0, 255</span>
+          </div>
+          <div class="color">
+            <div class="swatch cyan"></div>
+            <span>0, 255, 255</span>
+          </div>
+        </div>
+      </div>
+
+      <footer>Processing happens entirely in your browser.</footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
