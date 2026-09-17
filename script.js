@@ -6,6 +6,10 @@ const resultContext = resultCanvas.getContext("2d");
 const downloadButton = document.getElementById("downloadButton");
 const status = document.getElementById("status");
 
+/* Keep browser scaling from inventing blended edge colors. */
+originalContext.imageSmoothingEnabled = false;
+resultContext.imageSmoothingEnabled = false;
+
 /* Beatblock palette
    Only these colors are allowed in the final image.
 */
@@ -70,6 +74,7 @@ imageInput.addEventListener("change", function () {
 
     /* Draw original image. */
     originalContext.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+    originalContext.imageSmoothingEnabled = false;
     originalContext.drawImage(image, 0, 0);
 
     /* Get all pixels. */
