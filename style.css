@@ -50,6 +50,11 @@ h1 {
   background: #202020;
 }
 
+.upload-box.drag-over {
+  border-color: #00ffff;
+  background: #202828;
+}
+
 .upload-icon {
   font-size: 50px;
   line-height: 50px;

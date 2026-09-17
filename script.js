@@ -5,6 +5,7 @@ const originalContext = originalCanvas.getContext("2d");
 const resultContext = resultCanvas.getContext("2d");
 const downloadButton = document.getElementById("downloadButton");
 const status = document.getElementById("status");
+const uploadBox = document.getElementById("uploadBox");
 
 /* Keep browser scaling from inventing blended edge colors. */
 originalContext.imageSmoothingEnabled = false;
@@ -48,14 +49,7 @@ function closestColor(r, g, b) {
   return closest;
 }
 
-/* Process the uploaded image. */
-imageInput.addEventListener("change", function () {
-  const file = imageInput.files[0];
-
-  if (!file) {
-    return;
-  }
-
+function processFile(file) {
   if (!file.type.startsWith("image/")) {
     status.textContent = "Please choose an image.";
     return;
@@ -90,7 +84,7 @@ imageInput.addEventListener("change", function () {
       const g = pixels[i + 1];
       const b = pixels[i + 2];
 
-      /* Keep transparency. */
+      /* Keep fully transparent pixels, but flatten anti-aliased edges. */
       const alpha = pixels[i + 3];
 
       if (alpha === 0) {
@@ -102,9 +96,11 @@ imageInput.addEventListener("change", function () {
       pixels[i] = color[0];
       pixels[i + 1] = color[1];
       pixels[i + 2] = color[2];
+      pixels[i + 3] = 255;
     }
 
     /* Put the converted pixels onto the result canvas. */
+    resultContext.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
     resultContext.putImageData(imageData, 0, 0);
     status.textContent = "Done! Every visible pixel now uses the Beatblock palette.";
     downloadButton.disabled = false;
@@ -113,8 +109,43 @@ imageInput.addEventListener("change", function () {
     URL.revokeObjectURL(image.src);
   };
 
+  image.onerror = function () {
+    status.textContent = "Unable to read that image.";
+    URL.revokeObjectURL(image.src);
+  };
+
   /* Convert the selected file into a browser-readable image. */
   image.src = URL.createObjectURL(file);
+}
+
+imageInput.addEventListener("change", function () {
+  const file = imageInput.files[0];
+
+  if (file) {
+    processFile(file);
+  }
+});
+
+uploadBox.addEventListener("dragover", function (event) {
+  event.preventDefault();
+  uploadBox.classList.add("drag-over");
+});
+
+uploadBox.addEventListener("dragleave", function (event) {
+  if (!uploadBox.contains(event.relatedTarget)) {
+    uploadBox.classList.remove("drag-over");
+  }
+});
+
+uploadBox.addEventListener("drop", function (event) {
+  event.preventDefault();
+  uploadBox.classList.remove("drag-over");
+
+  const file = event.dataTransfer.files[0];
+
+  if (file) {
+    processFile(file);
+  }
 });
 
 /* Download the converted image. */
