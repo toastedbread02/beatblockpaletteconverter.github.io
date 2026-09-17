@@ -139,6 +139,7 @@ uploadBox.addEventListener("dragleave", function (event) {
 
 uploadBox.addEventListener("drop", function (event) {
   event.preventDefault();
+  event.stopPropagation();
   uploadBox.classList.remove("drag-over");
 
   const file = event.dataTransfer.files[0];
@@ -146,6 +147,15 @@ uploadBox.addEventListener("drop", function (event) {
   if (file) {
     processFile(file);
   }
+});
+
+/* Prevent the browser from opening dropped files as a new page. */
+document.addEventListener("dragover", function (event) {
+  event.preventDefault();
+});
+
+document.addEventListener("drop", function (event) {
+  event.preventDefault();
 });
 
 /* Download the converted image. */
