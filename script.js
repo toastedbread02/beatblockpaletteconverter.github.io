@@ -49,6 +49,74 @@ function closestColor(r, g, b) {
   return closest;
 }
 
+function removeIsolatedPalettePixels(pixels, width, height) {
+  const cleanedPixels = new Uint8ClampedArray(pixels);
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      const pixelIndex = (y * width + x) * 4;
+      const currentAlpha = pixels[pixelIndex + 3];
+
+      if (currentAlpha !== 255) {
+        continue;
+      }
+
+      let surroundingColor = null;
+      let allNeighborsMatch = true;
+
+      for (let neighborY = y - 1; neighborY <= y + 1; neighborY++) {
+        for (let neighborX = x - 1; neighborX <= x + 1; neighborX++) {
+          if (neighborX === x && neighborY === y) {
+            continue;
+          }
+
+          const neighborIndex = (neighborY * width + neighborX) * 4;
+          const neighborColor = [
+            pixels[neighborIndex],
+            pixels[neighborIndex + 1],
+            pixels[neighborIndex + 2],
+            pixels[neighborIndex + 3],
+          ];
+
+          if (neighborColor[3] !== 255) {
+            allNeighborsMatch = false;
+            break;
+          }
+
+          if (!surroundingColor) {
+            surroundingColor = neighborColor;
+          } else if (
+            neighborColor[0] !== surroundingColor[0] ||
+            neighborColor[1] !== surroundingColor[1] ||
+            neighborColor[2] !== surroundingColor[2]
+          ) {
+            allNeighborsMatch = false;
+            break;
+          }
+        }
+
+        if (!allNeighborsMatch) {
+          break;
+        }
+      }
+
+      if (
+        allNeighborsMatch &&
+        surroundingColor &&
+        (pixels[pixelIndex] !== surroundingColor[0] ||
+          pixels[pixelIndex + 1] !== surroundingColor[1] ||
+          pixels[pixelIndex + 2] !== surroundingColor[2])
+      ) {
+        cleanedPixels[pixelIndex] = surroundingColor[0];
+        cleanedPixels[pixelIndex + 1] = surroundingColor[1];
+        cleanedPixels[pixelIndex + 2] = surroundingColor[2];
+      }
+    }
+  }
+
+  pixels.set(cleanedPixels);
+}
+
 function processFile(file) {
   if (!file.type.startsWith("image/")) {
     status.textContent = "Please choose an image.";
@@ -98,6 +166,8 @@ function processFile(file) {
       pixels[i + 2] = color[2];
       pixels[i + 3] = 255;
     }
+
+    removeIsolatedPalettePixels(pixels, image.width, image.height);
 
     /* Put the converted pixels onto the result canvas. */
     resultContext.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
